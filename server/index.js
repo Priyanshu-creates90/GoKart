@@ -1,56 +1,84 @@
-import express from "express"    
-import cors from "cors"        
-import dotenv from "dotenv"
-dotenv.config()  
-import cookieParser from "cookie-parser"
-import morgan from "morgan"
-import helmet from "helmet"
-import connectDB from "./config/connectDB.js"
-import userRouter from "./route/user.route.js"
-import categoryRouter from "./route/category.route.js"
-import uploadRouter from "./route/upload.router.js"
-import subCategoryRouter from "./route/subCategory.route.js"
-import productRouter from "./route/product.route.js"
-import cartRouter from "./route/cart.route.js"
-import addressRouter from "./route/address.route.js"
-import orderRouter from "./route/order.route.js"
-import chatRouter from "./route/chat.route.js"
 
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import morgan from "morgan";
+import helmet from "helmet";
 
-const app = express()
-app.use(cors({
-    credentials : true,
-    origin : process.env.FRONTEND_URL    //url of frontend
-}))
-app.use(express.json())    //all request will be in json format
-app.use(cookieParser())
-app.use(morgan())
-app.use(helmet({
-    crossOriginResourcePolicy : false   //allow request from any domain
-}))
+import connectDB from "./config/connectDB.js";
 
-const PORT = 8080 || process.env.PORT
+import userRouter from "./route/user.route.js";
+import categoryRouter from "./route/category.route.js";
+import uploadRouter from "./route/upload.router.js";
+import subCategoryRouter from "./route/subCategory.route.js";
+import productRouter from "./route/product.route.js";
+import cartRouter from "./route/cart.route.js";
+import addressRouter from "./route/address.route.js";
+import orderRouter from "./route/order.route.js";
+import chatRouter from "./route/chat.route.js";
 
-app.get("/", (request, response) => {
-    //server to client
-    response.json({
-        message: "Server is running " + PORT
-    })
-})
+dotenv.config();
 
-app.use('/api/user', userRouter)
-app.use('/api/category', categoryRouter)
-app.use("/api/file", uploadRouter)
-app.use('/api/subcategory', subCategoryRouter)
-app.use('/api/product', productRouter)
-app.use('/api/cart', cartRouter)
-app.use('/api/address', addressRouter)
-app.use('/api/order', orderRouter)
-app.use('/api/chat', chatRouter)
+const app = express();
 
-connectDB().then(()=>{
-    app.listen(PORT,()=>{
-        console.log("Server is running ",PORT)
-    })
-})
+// Middleware
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
+app.use(express.json());
+app.use(cookieParser());
+app.use(morgan("dev"));
+
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
+// Health-check route
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "GoKart server is running",
+  });
+});
+
+// Ensure the database is connected before handling API requests.
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection failed:", error.message);
+    res.status(503).json({
+      success: false,
+      message: "Database connection failed",
+    });
+  }
+});
+
+// API routes
+app.use("/api/user", userRouter);
+app.use("/api/category", categoryRouter);
+app.use("/api/file", uploadRouter);
+app.use("/api/subcategory", subCategoryRouter);
+app.use("/api/product", productRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/address", addressRouter);
+app.use("/api/order", orderRouter);
+app.use("/api/chat", chatRouter);
+
+// Handle unknown routes
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+export default app;

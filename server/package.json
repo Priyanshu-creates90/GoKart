@@ -1,16 +1,14 @@
+
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "GoKart Express backend",
   "type": "module",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
@@ -25,5 +23,8 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.16",
     "stripe": "^17.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
