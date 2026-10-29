@@ -1,5 +1,10 @@
-import stripe from 'stripe'
+import stripe from 'stripe';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const Stripe = stripe(process.env.STRIPE_SECRET_KEY)
+// Fallback to a placeholder secret key if STRIPE_SECRET_KEY is not yet added to Vercel
+// This prevents the Vercel serverless function from crashing during initialization.
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "sk_test_placeholder_key_until_configured";
+const Stripe = stripe(stripeSecretKey);
 
-export default Stripe
+export default Stripe;
