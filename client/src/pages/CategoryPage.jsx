@@ -56,7 +56,7 @@ const CategoryPage = () => {
             }
 
         } catch (error) {
-            toast.error(error)
+            AxiosToastError(error)
         } finally {
             setLoading(false)
         }

@@ -23,11 +23,13 @@ import CartMobile from "../pages/CartMobile.jsx"
 import CheckoutPage from "../pages/CheckoutPage.jsx";
 import Success from "../pages/Success.jsx"
 import Cancel from "../pages/Cancel.jsx";
+import RouteErrorBoundary from "../components/RouteErrorBoundary.jsx";
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <App/>,
+        errorElement: <RouteErrorBoundary/>,
         children: [
             {
                 path: "", 

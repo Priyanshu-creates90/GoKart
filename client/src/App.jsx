@@ -13,6 +13,7 @@ import { setAllCategory, setAllSubCategory, setLoadingCategory } from './store/p
 import GlobalProvider from './provider/GlobalProvider.jsx';
 import CartMobileLink from './components/CartMobile.jsx'
 import ChatWidget from './components/ChatWidget.jsx'
+import AxiosToastError from './utils/AxiosToastError.js';
 import { useLocation } from 'react-router-dom';
 
 
@@ -38,7 +39,7 @@ function App() {
       }
 
     } catch (error) {
-      toast.error(error)
+      AxiosToastError(error)
     } finally {
       dispatch(setLoadingCategory(false))
     }
@@ -58,7 +59,7 @@ function App() {
       }
 
     } catch (error) {
-      toast.error(error)
+      AxiosToastError(error)
     }
   }
 
