@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux';
+import { setAllSubCategory } from '../store/productSlice.js';
 import UploadSubCategoryModel from '../components/UploadSubCategoryModel';
 import AxiosToastError from '../utils/AxiosToastError';
 import Axios from '../utils/Axios';
@@ -14,6 +16,7 @@ import ConfirmBox from '../components/ConfirmBox'
 
 
 const SubCategoryPage = () => {
+  const dispatch = useDispatch();
   const [openAddSubCategory, setOpenAddSubCategory] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -102,6 +105,7 @@ const SubCategoryPage = () => {
 
       if (responseData.success) {
         setData(responseData.data)
+        dispatch(setAllSubCategory(responseData.data))
       }
     } catch (error) {
       AxiosToastError(error)

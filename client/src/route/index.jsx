@@ -23,6 +23,7 @@ import CartMobile from "../pages/CartMobile.jsx"
 import CheckoutPage from "../pages/CheckoutPage.jsx";
 import Success from "../pages/Success.jsx"
 import Cancel from "../pages/Cancel.jsx";
+import VerifyEmail from "../pages/VerifyEmail.jsx";
 import RouteErrorBoundary from "../components/RouteErrorBoundary.jsx";
 
 const router = createBrowserRouter([
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
             {
                 path: "register",
                 element: <Register/>
+            },
+            {
+                path: "verify-email",
+                element: <VerifyEmail/>
             }, 
             {
                 path: "forgot-password", 

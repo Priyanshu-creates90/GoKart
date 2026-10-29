@@ -1,6 +1,15 @@
+Bugs Resolution Status:
 1. on editing or adding category home page doesn't change since data of only category admin is changed.
+   [RESOLVED]: Added Redux dispatch (setAllCategory & setAllSubCategory) in CategoryPage and SubCategoryPage after every add/edit/delete operation so global store and Home page stay in sync.
+
 2. since going to a category => then changing subcategory may change category. since url consider first category[0] only.
+   [RESOLVED]: ProductListPage subcategory rail now looks up the category that matches current categoryId instead of always hardcoding s.category[0].
+
 3. verify email just dumy. => login accessed without verification. 
+   [RESOLVED]: Enforced user.verify_email check in loginController. Added /verify-email endpoint, SummaryApi definition, and created client VerifyEmail.jsx page with proper verification flow.
+
 4. on Ordering stock doesn't change.
+   [RESOLVED]: CashOnDeliveryOrderController, verifyPaymentController, and webhookStripe now decrement ProductModel stock by the ordered quantity for each item.
+
 5. online payment doesn't work.
-6. 
+   [RESOLVED]: Updated Stripe payment controller to sanitize images and amounts, return session.url, added verifyPaymentController with Stripe session verification, surfaced online payment button on CheckoutPage, and integrated automatic session verification on Success page.

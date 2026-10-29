@@ -8,6 +8,7 @@ import uploadImageClodinary from '../utils/uploadImageClodinary.js'
 import generatedOtp from '../utils/generatedOtp.js'
 import forgotPasswordTemplate from '../utils/forgotPasswordTemplate.js'
 import jwt from 'jsonwebtoken'
+import mongoose from 'mongoose'
 
 // register page
 export async function registerUserController(request,response){
@@ -75,33 +76,41 @@ export async function registerUserController(request,response){
 // verify email 
 export async function verifyEmailController(request,response){
     try {
-        const { code } = request.body
+        const code = request.body?.code || request.query?.code;
 
-        const user = await UserModel.findOne({ _id : code})
+        if (!code || !mongoose.Types.ObjectId.isValid(code)) {
+            return response.status(400).json({
+                message : "Invalid or missing verification code",
+                error : true,
+                success : false
+            });
+        }
+
+        const user = await UserModel.findOne({ _id : code });
 
         if(!user){
             return response.status(400).json({
-                message : "Invalid code",
+                message : "User not found or verification link expired",
                 error : true,
                 success : false
-            })
+            });
         }
 
-        const updateUser = await UserModel.updateOne({ _id : code },{
+        await UserModel.updateOne({ _id : code }, {
             verify_email : true
-        })
+        });
 
         return response.json({
-            message : "Verify email done",
+            message : "Email verified successfully! You can now log in.",
             success : true,
             error : false
-        })
+        });
     } catch (error) {
         return response.status(500).json({
             message : error.message || error,
             error : true,
-            success : true
-        })
+            success : false
+        });
     }
 }
 
@@ -125,6 +134,14 @@ export async function loginController(request,response){
         if(!user){
             return response.status(400).json({
                 message : "User not register",
+                error : true,
+                success : false
+            })
+        }
+
+        if(!user.verify_email){
+            return response.status(400).json({
+                message : "Please verify your email before logging in. Check your inbox for the verification link.",
                 error : true,
                 success : false
             })

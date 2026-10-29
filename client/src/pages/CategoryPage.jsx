@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { setAllCategory } from '../store/productSlice.js'
 import UploadCategoryModel from '../components/UploadCategoryModel'
 import Loading from '../components/Loading'
 import NoData from '../components/NoData'
@@ -11,6 +13,7 @@ import AxiosToastError from '../utils/AxiosToastError'
 import { HiPlus, HiOutlinePencilSquare, HiOutlineTrash } from 'react-icons/hi2'
 
 const CategoryPage = () => {
+    const dispatch = useDispatch()
     const [openUploadCategory, setOpenUploadCategory] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [loading, setLoading] = useState(false)
@@ -53,6 +56,7 @@ const CategoryPage = () => {
 
             if (responseData.success) {
                 setCategoryData(responseData.data)
+                dispatch(setAllCategory(responseData.data))
             }
 
         } catch (error) {

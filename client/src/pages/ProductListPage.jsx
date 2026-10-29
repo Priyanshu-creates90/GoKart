@@ -93,7 +93,9 @@ const ProductListPage = () => {
             <div className="grid max-h-[22vh] gap-1 overflow-y-auto scrollbar-slim p-2 lg:max-h-[calc(100%-3rem)]">
               {
                 DisplaySubCatory.map((s) => {
-                  const link = `/${valideURLConvert(s?.category[0]?.name)}-${s?.category[0]?._id}/${valideURLConvert(s.name)}-${s._id}`
+                  const currentCat = s?.category?.find(c => String(c?._id || c) === String(categoryId)) || s?.category?.[0];
+                  const categorySlug = currentCat ? `${valideURLConvert(currentCat.name || categoryName)}-${currentCat._id || categoryId}` : params.category;
+                  const link = `/${categorySlug}/${valideURLConvert(s.name)}-${s._id}`;
                   const active = subCategoryId === s._id
 
                   return (

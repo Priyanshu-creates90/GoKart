@@ -9,7 +9,7 @@ import SummaryApi from '../common/SummaryApi'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { loadStripe } from '@stripe/stripe-js'
-import { HiOutlineMapPin, HiPlus, HiOutlineBanknotes } from 'react-icons/hi2'
+import { HiOutlineMapPin, HiPlus, HiOutlineBanknotes, HiOutlineCreditCard } from 'react-icons/hi2'
 
 const CheckoutPage = () => {
   const { notDiscountTotalPrice, totalPrice, totalQty, fetchCartItem, fetchOrder } = useGlobalContext()
@@ -17,10 +17,18 @@ const CheckoutPage = () => {
   const addressList = useSelector(state => state.addresses.addressList)
   const [selectAddress, setSelectAddress] = useState(0)
   const cartItemsList = useSelector(state => state.cartItem.cart)
+  const [onlineLoading, setOnlineLoading] = useState(false)
+  const [codLoading, setCodLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleCashOnDelivery = async () => {
+    if (!addressList || !addressList[selectAddress]?._id) {
+      toast.error("Please add and select a delivery address")
+      return
+    }
+
     try {
+      setCodLoading(true)
       const response = await Axios({
         ...SummaryApi.CashOnDeliveryOrder,
         data: {
@@ -50,16 +58,19 @@ const CheckoutPage = () => {
 
     } catch (error) {
       AxiosToastError(error)
+    } finally {
+      setCodLoading(false)
     }
   }
 
-  // online payment is kept wired up but not surfaced yet — see Bugs.txt
   const handleOnlinePayment = async () => {
-    try {
-      toast.loading("Loading...")
-      const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY
-      const stripePromise = await loadStripe(stripePublicKey)
+    if (!addressList || !addressList[selectAddress]?._id) {
+      toast.error("Please add and select a delivery address")
+      return
+    }
 
+    try {
+      setOnlineLoading(true)
       const response = await Axios({
         ...SummaryApi.payment_url,
         data: {
@@ -72,16 +83,24 @@ const CheckoutPage = () => {
 
       const { data: responseData } = response
 
-      stripePromise.redirectToCheckout({ sessionId: responseData.id })
-
-      if (fetchCartItem) {
-        fetchCartItem()
+      if (responseData?.url) {
+        window.location.href = responseData.url
+        return
       }
-      if (fetchOrder) {
-        fetchOrder()
+
+      if (responseData?.id) {
+        const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY
+        if (stripePublicKey) {
+          const stripePromise = await loadStripe(stripePublicKey)
+          await stripePromise.redirectToCheckout({ sessionId: responseData.id })
+        } else {
+          toast.error("Stripe public key (VITE_STRIPE_PUBLIC_KEY) is not set")
+        }
       }
     } catch (error) {
       AxiosToastError(error)
+    } finally {
+      setOnlineLoading(false)
     }
   }
 
@@ -189,13 +208,27 @@ const CheckoutPage = () => {
               }
             </dl>
 
-            <div className="border-t border-line p-5">
-              <button onClick={handleCashOnDelivery} className="btn-primary btn-block btn-lg">
-                <HiOutlineBanknotes size={18} />
-                Pay on delivery
+            <div className="flex flex-col gap-3 border-t border-line p-5">
+              <button 
+                onClick={handleOnlinePayment} 
+                disabled={onlineLoading || codLoading}
+                className="btn-primary btn-block btn-lg"
+              >
+                <HiOutlineCreditCard size={18} />
+                {onlineLoading ? "Connecting to Stripe..." : "Pay Online (Cards / Stripe)"}
               </button>
-              <p className="mt-3 text-center text-xs text-fg-faint">
-                Cash or UPI when your order arrives.
+
+              <button 
+                onClick={handleCashOnDelivery} 
+                disabled={onlineLoading || codLoading}
+                className="btn-outline btn-block btn-lg"
+              >
+                <HiOutlineBanknotes size={18} />
+                {codLoading ? "Placing Order..." : "Cash on Delivery"}
+              </button>
+
+              <p className="mt-1 text-center text-xs text-fg-faint">
+                Secure checkout encrypted with 256-bit SSL.
               </p>
             </div>
           </div>

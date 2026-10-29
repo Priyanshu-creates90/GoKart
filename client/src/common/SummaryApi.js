@@ -4,6 +4,10 @@ const SummaryApi = {
     register : {
         url : '/api/user/register',
         method : 'POST',
+    },
+    verify_email : {
+        url : '/api/user/verify-email',
+        method : 'POST',
     }, 
     login : {
         url : '/api/user/login',
@@ -143,6 +147,10 @@ const SummaryApi = {
     },
     payment_url : {
         url : "/api/order/checkout",
+        method : 'post'
+    },
+    verify_payment : {
+        url : "/api/order/verify-payment",
         method : 'post'
     },
     getOrderItems : {
