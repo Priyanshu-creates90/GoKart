@@ -22,19 +22,60 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-// Middleware
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // In development or serverless, permit frontend requests
-      if (!origin || !process.env.FRONTEND_URL || origin === process.env.FRONTEND_URL) {
-        return callback(null, true);
-      }
+// Build allowed origins list from environment and standard development ports
+const configuredOrigins = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((url) => url.trim().replace(/^["']|["']$/g, "").replace(/\/$/, ""))
+  .filter(Boolean);
+
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:3000",
+];
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Permit server-to-server, curl, Postman, or native mobile apps
+    if (!origin) {
       return callback(null, true);
-    },
-    credentials: true,
-  })
-);
+    }
+
+    const cleanOrigin = origin.replace(/\/$/, "");
+
+    // Allow explicitly configured origins, localhost, or any *.vercel.app domain
+    const isAllowed =
+      allowedOrigins.includes(cleanOrigin) ||
+      cleanOrigin.startsWith("http://localhost:") ||
+      cleanOrigin.startsWith("http://127.0.0.1:") ||
+      cleanOrigin.endsWith(".vercel.app");
+
+    if (isAllowed) {
+      return callback(null, cleanOrigin);
+    }
+
+    console.warn(`Blocked by CORS: ${origin}`);
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Cookie",
+    "X-Requested-With",
+    "Accept",
+  ],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -55,6 +96,7 @@ app.get("/", (req, res) => {
     success: true,
     message: "GoKart server is running",
     environment: process.env.NODE_ENV || "production",
+    allowedOrigins: allowedOrigins,
   });
 });
 
@@ -100,4 +142,3 @@ app.use((req, res) => {
 });
 
 export default app;
-
