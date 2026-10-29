@@ -20,6 +20,8 @@ import chatRouter from "./route/chat.route.js";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 // Middleware
 app.use(
   cors({
@@ -44,12 +46,22 @@ app.use(
   })
 );
 
-// Health-check route (responds immediately for Vercel health checks without waiting on DB)
+// Respond to favicon immediately so Chrome doesn't trigger database connections
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+
+// Health-check routes (respond immediately without waiting on DB)
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
     message: "GoKart server is running",
     environment: process.env.NODE_ENV || "production",
+  });
+});
+
+app.get("/api", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "GoKart API is running",
   });
 });
 
@@ -62,7 +74,7 @@ app.use(async (req, res, next) => {
     console.error("Database connection failed:", error.message);
     res.status(503).json({
       success: false,
-      message: "Database connection failed. Please ensure MONGODB_URL is configured in Vercel settings.",
+      message: "Database connection failed. Please ensure MONGODB_URL is configured in Vercel Environment Variables and MongoDB Atlas has 0.0.0.0/0 whitelisted in Network Access.",
       error: error.message,
     });
   }
