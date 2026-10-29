@@ -1,0 +1,6 @@
+1. on editing or adding category home page doesn't change since data of only category admin is changed.
+2. since going to a category => then changing subcategory may change category. since url consider first category[0] only.
+3. verify email just dumy. => login accessed without verification. 
+4. on Ordering stock doesn't change.
+5. online payment doesn't work.
+6. 

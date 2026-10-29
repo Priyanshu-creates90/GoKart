@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   GoKart design tokens — "Ink & Saffron"
+   Light: warm cream ground, white cards, ink text, saffron accent
+   Dark : deep ink ground, navy cards, cream text, brighter saffron
+-------------------------------------------------------------------*/
+@layer base {
+  :root {
+    --k-ground: 251 247 240;
+    --k-surface: 255 255 255;
+    --k-sunken: 244 238 228;
+    --k-line: 231 222 208;
+    --k-line-strong: 211 198 176;
+
+    --k-fg: 22 26 44;
+    --k-fg-muted: 92 100 122;
+    --k-fg-faint: 139 145 164;
+
+    --k-brand: 216 138 34;
+    --k-brand-strong: 183 110 25;
+    --k-brand-soft: 253 243 226;
+    --k-on-brand: 20 24 43;
+
+    --k-positive: 28 116 84;
+    --k-positive-soft: 226 243 235;
+    --k-critical: 187 66 52;
+    --k-critical-soft: 251 232 228;
+
+    --k-shadow: 40 32 20;
+  }
+
+  .dark {
+    --k-ground: 10 13 24;
+    --k-surface: 20 24 43;
+    --k-sunken: 27 32 55;
+    --k-line: 44 52 80;
+    --k-line-strong: 62 72 108;
+
+    --k-fg: 241 238 231;
+    --k-fg-muted: 165 172 194;
+    --k-fg-faint: 116 124 152;
+
+    --k-brand: 240 177 85;
+    --k-brand-strong: 232 163 61;
+    --k-brand-soft: 44 34 20;
+    --k-on-brand: 16 19 34;
+
+    --k-positive: 92 199 146;
+    --k-positive-soft: 17 44 34;
+    --k-critical: 233 116 100;
+    --k-critical-soft: 54 25 21;
+
+    --k-shadow: 0 0 0;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-ground text-fg font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight text-fg;
+  }
+
+  ::selection {
+    @apply bg-brand/30;
+  }
+
+  /* consistent focus ring across the app */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-ground;
+  }
+}
+
+@layer components {
+  /* ---------------- buttons ---------------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill px-4 py-2 text-sm font-semibold
+           transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 select-none;
+  }
+  .btn-primary {
+    @apply btn bg-brand text-brand-on hover:bg-brand-strong hover:text-white active:scale-[0.98] shadow-card;
+  }
+  .btn-ink {
+    @apply btn bg-ink text-ink-50 hover:bg-ink-600 active:scale-[0.98] shadow-card
+           dark:bg-ink-50 dark:text-ink-900 dark:hover:bg-white;
+  }
+  .btn-outline {
+    @apply btn border border-line-strong text-fg hover:border-brand hover:text-brand hover:bg-brand-soft;
+  }
+  .btn-ghost {
+    @apply btn text-fg-muted hover:bg-sunken hover:text-fg;
+  }
+  .btn-critical {
+    @apply btn border border-critical/40 bg-critical-soft text-critical hover:bg-critical hover:text-white;
+  }
+  .btn-positive {
+    @apply btn border border-positive/40 bg-positive-soft text-positive hover:bg-positive hover:text-white;
+  }
+  .btn-sm { @apply px-3 py-1.5 text-xs; }
+  .btn-lg { @apply px-6 py-3 text-base; }
+  .btn-block { @apply w-full; }
+
+  /* ---------------- surfaces ---------------- */
+  .card {
+    @apply bg-surface border border-line rounded-card shadow-card;
+  }
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lift hover:border-brand/40;
+  }
+  .panel {
+    @apply bg-surface border border-line rounded-card;
+  }
+  .panel-head {
+    @apply flex items-center justify-between gap-4 px-4 py-3 border-b border-line;
+  }
+  .section-title {
+    @apply font-display text-xl lg:text-2xl font-semibold tracking-tight;
+  }
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint;
+  }
+
+  /* ---------------- form ---------------- */
+  .label {
+    @apply text-sm font-medium text-fg-muted;
+  }
+  .input {
+    @apply w-full bg-sunken text-fg placeholder:text-fg-faint border border-line rounded-xl px-3.5 py-2.5 text-sm
+           outline-none transition-colors duration-200 focus:border-brand focus:bg-surface;
+  }
+  .input-shell {
+    @apply flex items-center gap-2 bg-sunken border border-line rounded-xl px-3.5 py-2.5
+           transition-colors duration-200 focus-within:border-brand focus-within:bg-surface;
+  }
+  .input-bare {
+    @apply w-full bg-transparent text-sm text-fg placeholder:text-fg-faint outline-none;
+  }
+  .select {
+    @apply input appearance-none cursor-pointer;
+  }
+
+  /* ---------------- bits ---------------- */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-pill border border-line bg-sunken
+           px-2.5 py-1 text-xs font-medium text-fg-muted;
+  }
+  .chip-brand {
+    @apply chip border-brand/40 bg-brand-soft text-brand;
+  }
+  .chip-positive {
+    @apply chip border-positive/30 bg-positive-soft text-positive;
+  }
+  .chip-critical {
+    @apply chip border-critical/30 bg-critical-soft text-critical;
+  }
+  .divider {
+    @apply h-px w-full bg-line;
+  }
+  .link {
+    @apply font-semibold text-brand underline-offset-4 hover:underline;
+  }
+  .skeleton {
+    @apply rounded-xl bg-gradient-to-r from-sunken via-line to-sunken bg-[length:200%_100%] animate-sweep;
+  }
+  .price {
+    @apply font-display font-semibold tabular-nums text-fg;
+  }
+
+  /* ---------------- overlays ---------------- */
+  .overlay {
+    @apply fixed inset-0 z-50 bg-ink-900/70 backdrop-blur-sm;
+  }
+  .modal {
+    @apply card w-full shadow-pop animate-rise;
+  }
+  .modal-head {
+    @apply flex items-center justify-between gap-4 px-5 py-4 border-b border-line;
+  }
+  .icon-btn {
+    @apply inline-flex items-center justify-center rounded-full p-2 text-fg-muted
+           transition-colors hover:bg-sunken hover:text-fg;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .scrollbar-slim::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-slim::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-slim::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--k-line-strong));
+    border-radius: 999px;
+  }
+  .scrollbar-slim { scrollbar-width: thin; }
+
+  .text-balance { text-wrap: balance; }
+}
